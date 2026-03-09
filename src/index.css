@@ -1,0 +1,165 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Plus Jakarta Sans", "Inter", ui-sans-serif, system-ui, sans-serif;
+}
+
+:root {
+  /* Soft Pastel Theme from Image */
+  --bg-gradient: linear-gradient(135deg, #f3e8ff 0%, #fce7f3 100%); /* Lavender to Rose */
+  --glass-bg: rgba(255, 255, 255, 0.65);
+  --glass-border: rgba(255, 255, 255, 0.8);
+  --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+  --text-main: #334155; /* Slate 700 */
+  --text-secondary: #64748b; /* Slate 500 */
+  --primary-color: #8b5cf6; /* Violet 500 */
+  --accent-color: #ec4899; /* Pink 500 */
+}
+
+body {
+  background: #fdf4ff; /* Fallback */
+  color: var(--text-main);
+  min-height: 100vh;
+  overflow-x: hidden;
+  font-feature-settings: "cv11", "ss01";
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Soft Background Blobs */
+.bg-shape {
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(100px);
+  z-index: -1;
+  opacity: 0.8;
+  animation: float 20s infinite ease-in-out;
+}
+
+.shape-1 {
+  top: -10%;
+  left: -10%;
+  width: 800px;
+  height: 800px;
+  background: radial-gradient(circle, rgba(233, 213, 255, 0.8) 0%, rgba(245, 208, 254, 0.4) 100%); /* Purple/Pink */
+  animation-delay: 0s;
+}
+
+.shape-2 {
+  bottom: -10%;
+  right: -10%;
+  width: 700px;
+  height: 700px;
+  background: radial-gradient(circle, rgba(251, 207, 232, 0.8) 0%, rgba(244, 114, 182, 0.2) 100%); /* Pink */
+  animation-delay: -5s;
+}
+
+.shape-3 {
+  top: 40%;
+  left: 30%;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(196, 181, 253, 0.6) 0%, rgba(167, 139, 250, 0.2) 100%); /* Violet */
+  animation-delay: -8s;
+  opacity: 0.6;
+}
+
+@keyframes float {
+  0%, 100% { transform: translate(0, 0) rotate(0deg) scale(1); }
+  33% { transform: translate(30px, -50px) rotate(5deg) scale(1.05); }
+  66% { transform: translate(-20px, 20px) rotate(-5deg) scale(0.95); }
+}
+
+/* Reference Image Style Utilities */
+
+/* Main Glass Card (White, Soft Shadow) */
+.neu-glass {
+  background: rgba(255, 255, 255, 0.7);
+  box-shadow: 0 10px 40px -10px rgba(0,0,0,0.05);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  border-radius: 24px;
+}
+
+/* Sidebar / Header (More Opaque White) */
+.neu-glass-panel {
+  background: rgba(255, 255, 255, 0.85);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-right: 1px solid rgba(255, 255, 255, 0.6);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.6);
+}
+
+/* Buttons (Vibrant Purple/Pink Gradient or Clean White) */
+.neu-button {
+  background: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 1);
+  border-radius: 16px;
+  color: var(--text-secondary);
+  font-weight: 600;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.neu-button:hover {
+  background: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(139, 92, 246, 0.15); /* Purple glow */
+  color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+.neu-button:active {
+  transform: translateY(0);
+}
+
+/* Inputs (Clean White) */
+.neu-input {
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  border-radius: 16px;
+  padding: 12px 16px;
+  color: var(--text-main);
+  transition: all 0.3s ease;
+}
+
+.neu-input::placeholder {
+  color: #94a3b8;
+}
+
+.neu-input:focus {
+  background: #fff;
+  border-color: var(--primary-color);
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.1);
+}
+
+/* Icon Wrapper - Soft Pastel Circles */
+.neu-icon-wrapper {
+  background: #fff;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  border-radius: 16px; /* Rounded square like iOS/Mac */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary-color);
+}
+
+/* Inset - Soft Gray Recess */
+.neu-inset {
+  background: rgba(241, 245, 249, 0.5); /* Slate 100 */
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
