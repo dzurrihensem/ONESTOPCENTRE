@@ -54,9 +54,6 @@ import {
   BarChart3,
   Copy,
   Check,
-  AlertCircle,
-  CheckCircle,
-  Info,
 } from "lucide-react";
 
 // --- Helpers ---
@@ -117,10 +114,11 @@ const parseDateToISO = (dateStr: string): string => {
   const malayMonths: { [key: string]: string } = {
     'januari': '01', 'februari': '02', 'mac': '03', 'april': '04', 'mei': '05', 'jun': '06',
     'julai': '07', 'ogos': '08', 'september': '09', 'oktober': '10', 'november': '11', 'disember': '12',
-    'jan': '01', 'feb': '02', 'apr': '04', 'jul': '07', 'ogo': '08', 'sep': '09', 'okt': '10', 'nov': '11', 'dis': '12'
+    'jan': '01', 'feb': '02', 'apr': '04',
+    'jul': '07', 'ogo': '08', 'sep': '09', 'okt': '10', 'nov': '11', 'dis': '12'
   };
 
-  // Try DD Month YYYY (e.g., 1 Mac 2026 or 01 Mac 2026)
+  // Try DD Month YYYY (e.g., 1 Mac 2026)
   const ddMonthYyyy = trimmed.match(/^(\d{1,2})\s+([a-z]+)\s+(\d{4})/);
   if (ddMonthYyyy) {
     const day = ddMonthYyyy[1].padStart(2, "0");
@@ -130,8 +128,8 @@ const parseDateToISO = (dateStr: string): string => {
     if (month) return `${year}-${month}-${day}`;
   }
 
-  // Try DD/MM/YYYY or D/M/YYYY or DD-MM-YYYY or DD.MM.YYYY
-  const ddmmyyyy = trimmed.match(/^(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{2,4})/);
+  // Try DD/MM/YYYY or D/M/YYYY or DD-MM-YYYY
+  const ddmmyyyy = trimmed.match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{2,4})/);
   if (ddmmyyyy) {
     const day = ddmmyyyy[1].padStart(2, "0");
     const month = ddmmyyyy[2].padStart(2, "0");
@@ -142,8 +140,8 @@ const parseDateToISO = (dateStr: string): string => {
     return `${year}-${month}-${day}`;
   }
   
-  // Try YYYY/MM/DD or YYYY-MM-DD or YYYY.MM.DD
-  const yyyymmdd = trimmed.match(/^(\d{4})[\/\-\.](\d{1,2})[\/\-\.](\d{1,2})/);
+  // Try YYYY/MM/DD
+  const yyyymmdd = trimmed.match(/^(\d{4})[\/-](\d{1,2})[\/-](\d{1,2})/);
   if (yyyymmdd) {
     const year = yyyymmdd[1];
     const month = yyyymmdd[2].padStart(2, "0");
@@ -224,7 +222,6 @@ type TakwimEvent = {
   date: string;
   type: "Cuti" | "Program" | "Peperiksaan" | "Lain-lain";
   description?: string;
-  category?: "Pengurusan" | "Kurikulum" | "HEM" | "Kokurikulum" | "Kesenian" | "Umum";
 };
 
 // --- Helper Functions ---
@@ -262,13 +259,7 @@ const GOOGLE_SHEET_CSV_URL_MURID = `https://docs.google.com/spreadsheets/d/12Ye1
 const GOOGLE_SHEET_CSV_URL_TAKWIM_READ = `https://docs.google.com/spreadsheets/d/1z-DEblbpyLRGb1-RxRubXSViWUM_dX2CIj-ugj53atw/export?format=csv&gid=0`;
 
 // Google Apps Script Web App URL for Takwim (Replace this after deployment)
-const GOOGLE_SCRIPT_URL_TAKWIM = "https://script.google.com/macros/s/AKfycbxD9YWFoWtO2-jfB54pB9M-Yf_dvTPjGKt9hG7m-dbBwc7-5sT_tNKUIOWrgqFhhrg16A/exec"; 
-
-// Google Apps Script Web App URL for Links (Replace this after deployment)
-const GOOGLE_SCRIPT_URL_LINKS = "YOUR_DEPLOYED_SCRIPT_URL_HERE"; 
-
-// Google Apps Script Web App URL for Keberadaan (Replace this after deployment)
-const GOOGLE_SCRIPT_URL_KEBERADAAN = "https://script.google.com/macros/s/AKfycbwRCh28Sanh3iQ8QStluKGDC_FnIjhc_4cfB7xfFdoz-z0zJ7oZkQV-grYN5qJY_Hu47A/exec"; 
+const GOOGLE_SCRIPT_URL_TAKWIM = "https://script.google.com/macros/s/AKfycbwZgeiUCQKluchVFCKAZY05QrSWmbQu-IX1t995Ud_lFu0PvVYnHvg3CquIXHf4LjvNIw/exec"; 
 
 // --- Mock Data ---
 const INITIAL_LINKS: WebLink[] = [
@@ -351,81 +342,65 @@ const IframeViewer = ({
   title: string;
   onClose: () => void;
 }) => {
-  const [isMinimized, setIsMinimized] = useState(false);
-
   return (
     <div className="fixed inset-0 z-[100] bg-white flex flex-col">
-      <div className="relative flex-1 w-full bg-gray-100">
+      <div className="relative flex-1 w-full h-full bg-slate-100">
         {/* Fallback overlay in case iframe fails to load due to X-Frame-Options */}
         <div className="absolute inset-0 flex flex-col items-center justify-center p-8 text-center z-0">
-          <ExternalLink size={48} className="text-gray-400 mb-4" />
-          <h3 className="text-xl font-semibold text-gray-700 mb-2">
+          <ExternalLink size={48} className="text-slate-400 mb-4" />
+          <h3 className="text-xl font-semibold text-slate-700 mb-2">
             Memuatkan {title}...
           </h3>
-          <p className="text-gray-500 max-w-md mb-6">
-            Jika aplikasi tidak dipaparkan, ia mungkin disebabkan oleh tetapan
-            keselamatan laman web tersebut.
+          <p className="text-slate-500 max-w-md mb-6 text-sm">
+            Jika aplikasi tidak dipaparkan, ia mungkin disebabkan oleh tetapan keselamatan laman web tersebut.
           </p>
           <a
             href={url}
             target="_blank"
             rel="noreferrer"
-            className="flex items-center gap-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-medium transition-colors shadow-lg shadow-indigo-200"
+            className="flex items-center gap-2 px-6 py-3 bg-violet-600 hover:bg-violet-700 text-white rounded-xl font-medium transition-colors shadow-lg shadow-violet-200"
           >
             <ExternalLink size={20} /> Buka di Tab Baru
           </a>
         </div>
 
+        {/* Unsandboxed iframe allows the application's native window.print() and PDF generation to execute directly without browser sandbox blocking */}
         <iframe
           src={url}
           className="w-full h-full border-0 absolute inset-0 z-10 bg-white"
           title={title}
-          sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
+          allow="clipboard-read; clipboard-write; fullscreen; camera; microphone; geolocation"
         />
 
-        {/* Floating Control Pill */}
+        {/* Minimal Floating Back Pill (Draggable) */}
         <motion.div
           drag
           dragMomentum={false}
-          initial={{ y: 100, opacity: 0 }}
+          initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          className="absolute bottom-6 left-1/2 -translate-x-1/2 z-[120] flex items-center gap-2 p-2 bg-slate-900/90 backdrop-blur-md text-white rounded-full shadow-2xl border border-white/10 cursor-grab active:cursor-grabbing"
+          className="absolute bottom-6 left-6 z-[120] flex items-center gap-2 p-1.5 bg-slate-900/90 hover:bg-slate-900 backdrop-blur-md text-white rounded-full shadow-2xl border border-white/20 cursor-grab active:cursor-grabbing transition-colors"
         >
           <button
             onClick={onClose}
-            className="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 rounded-full transition-all text-sm font-bold whitespace-nowrap"
+            className="flex items-center gap-2 px-3.5 py-1.5 bg-white/10 hover:bg-white/20 rounded-full transition-all text-xs font-bold whitespace-nowrap cursor-pointer"
+            title="Kembali ke Dashboard S1STEN"
           >
-            <ArrowLeft size={16} />
+            <ArrowLeft size={15} />
             <span>Kembali</span>
           </button>
-
-          {!isMinimized && (
-            <div className="h-4 w-px bg-white/20 mx-1"></div>
-          )}
-
-          {!isMinimized && (
-            <span className="text-xs font-medium px-2 max-w-[150px] truncate hidden sm:block opacity-80">
-              {title}
-            </span>
-          )}
-
+          <span className="text-xs font-medium px-2 max-w-[140px] truncate hidden sm:inline opacity-70">
+            {title}
+          </span>
           <a
             href={url}
             target="_blank"
             rel="noreferrer"
-            className="p-2 hover:bg-white/10 rounded-full transition-colors text-white/80 hover:text-white"
-            title="Buka di Tab Baru"
+            className="flex items-center gap-1.5 px-3.5 py-1.5 bg-violet-600 hover:bg-violet-700 rounded-full transition-all text-xs font-bold text-white shadow-md cursor-pointer whitespace-nowrap"
+            title="Buka terus di tab baharu untuk memaparkan kotak dialog cetak"
           >
-            <ExternalLink size={18} />
+            <ExternalLink size={14} />
+            <span>Buka di Tab Baru (Untuk Kotak Dialog Cetak)</span>
           </a>
-          
-          <button 
-            onClick={() => setIsMinimized(!isMinimized)}
-            className="p-1 hover:bg-white/10 rounded-full text-white/50 hover:text-white transition-colors"
-            title={isMinimized ? "Expand" : "Minimize"}
-          >
-            {isMinimized ? <Plus size={14} /> : <X size={14} />}
-          </button>
         </motion.div>
       </div>
     </div>
@@ -960,104 +935,7 @@ const TeacherAvatar = ({ src, alt }: { src?: string; alt: string }) => {
   );
 };
 
-const ConfirmModal = ({ 
-  isOpen, 
-  title, 
-  message, 
-  onConfirm, 
-  onCancel, 
-  confirmText = "Ya, Teruskan", 
-  cancelText = "Batal",
-  type = "danger"
-}: { 
-  isOpen: boolean; 
-  title: string; 
-  message: string; 
-  onConfirm: () => void; 
-  onCancel: () => void;
-  confirmText?: string;
-  cancelText?: string;
-  type?: "danger" | "primary"
-}) => {
-  if (!isOpen) return null;
-  
-  return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
-      <motion.div 
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 0.9 }}
-        className="neu-glass max-w-md w-full p-8 space-y-6"
-      >
-        <div className="flex items-center gap-4">
-          <div className={`p-3 rounded-2xl ${type === 'danger' ? 'bg-red-100 text-red-600' : 'bg-indigo-100 text-indigo-600'}`}>
-            <AlertCircle size={24} />
-          </div>
-          <h3 className="text-xl font-bold text-gray-800">{title}</h3>
-        </div>
-        <p className="text-gray-600 leading-relaxed font-medium">{message}</p>
-        <div className="flex gap-4 pt-2">
-          <button 
-            onClick={onCancel}
-            className="flex-1 py-3 neu-button text-gray-600 font-bold"
-          >
-            {cancelText}
-          </button>
-          <button 
-            onClick={onConfirm}
-            className={`flex-1 py-3 rounded-xl font-bold text-white shadow-lg transition-all hover:scale-105 active:scale-95 ${type === 'danger' ? 'bg-red-500 hover:bg-red-600' : 'bg-indigo-500 hover:bg-indigo-600'}`}
-          >
-            {confirmText}
-          </button>
-        </div>
-      </motion.div>
-    </div>
-  );
-};
-
-const Toast = ({ 
-  message, 
-  type = "success", 
-  onClose 
-}: { 
-  message: string; 
-  type?: "success" | "error" | "info"; 
-  onClose: () => void 
-}) => {
-  useEffect(() => {
-    const timer = setTimeout(onClose, 3000);
-    return () => clearTimeout(timer);
-  }, [onClose]);
-
-  const icons = {
-    success: <CheckCircle className="text-emerald-500" size={20} />,
-    error: <AlertCircle className="text-red-500" size={20} />,
-    info: <Info className="text-blue-500" size={20} />
-  };
-
-  const bgColors = {
-    success: "bg-emerald-50 border-emerald-100",
-    error: "bg-red-50 border-red-100",
-    info: "bg-blue-50 border-blue-100"
-  };
-
-  return (
-    <motion.div 
-      initial={{ opacity: 0, y: 50, x: "-50%" }}
-      animate={{ opacity: 1, y: 0, x: "-50%" }}
-      exit={{ opacity: 0, y: 50, x: "-50%" }}
-      className={`fixed bottom-8 left-1/2 z-[110] flex items-center gap-3 px-6 py-4 rounded-2xl border shadow-xl ${bgColors[type]}`}
-    >
-      {icons[type]}
-      <span className="font-bold text-gray-800 text-sm">{message}</span>
-      <button onClick={onClose} className="p-1 hover:bg-black/5 rounded-lg transition-colors">
-        <X size={16} className="text-gray-400" />
-      </button>
-    </motion.div>
-  );
-};
-
-const WargaS1STENModal = ({
+const WargaSSEMJModal = ({
   teachers,
   onClose,
 }: {
@@ -1086,7 +964,7 @@ const WargaS1STENModal = ({
             </div>
             <div>
               <h2 className="text-xl font-bold text-slate-800">
-                Warga S1STEN
+                Warga SSEMJ
               </h2>
               <p className="text-xs font-medium text-slate-500">
                 Senarai Guru dan Kakitangan
@@ -1162,25 +1040,6 @@ const WargaS1STENModal = ({
   );
 };
 
-const getEventColor = (event: TakwimEvent) => {
-  if (event.category) {
-    switch (event.category) {
-      case 'Kurikulum': return { dot: 'bg-green-500', badge: 'bg-green-50 text-green-600 border-green-200', border: 'border-l-green-500' };
-      case 'HEM': return { dot: 'bg-blue-500', badge: 'bg-blue-50 text-blue-600 border-blue-200', border: 'border-l-blue-500' };
-      case 'Kokurikulum': return { dot: 'bg-orange-500', badge: 'bg-orange-50 text-orange-600 border-orange-200', border: 'border-l-orange-500' };
-      case 'Kesenian': return { dot: 'bg-gray-800', badge: 'bg-gray-100 text-gray-800 border-gray-300', border: 'border-l-gray-800' };
-      case 'Pengurusan': return { dot: 'bg-purple-500', badge: 'bg-purple-50 text-purple-600 border-purple-200', border: 'border-l-purple-500' };
-    }
-  }
-  
-  switch (event.type) {
-    case 'Cuti': return { dot: 'bg-red-500', badge: 'bg-red-50 text-red-600 border-red-200', border: 'border-l-red-500' };
-    case 'Peperiksaan': return { dot: 'bg-amber-500', badge: 'bg-amber-50 text-amber-600 border-amber-200', border: 'border-l-amber-500' };
-    case 'Program': return { dot: 'bg-indigo-500', badge: 'bg-indigo-50 text-indigo-600 border-indigo-200', border: 'border-l-indigo-500' };
-    default: return { dot: 'bg-slate-400', badge: 'bg-slate-50 text-slate-600 border-slate-200', border: 'border-l-slate-400' };
-  }
-};
-
 const Calendar = ({ events }: { events: TakwimEvent[] }) => {
   const [currentDate, setCurrentDate] = useState(new Date()); // Default to Today
   const [selectedDate, setSelectedDate] = useState<string | null>(() => {
@@ -1222,22 +1081,7 @@ const Calendar = ({ events }: { events: TakwimEvent[] }) => {
     return events.filter(e => e.date === dateStr);
   };
 
-  const categoryOrder: Record<string, number> = {
-    'Pengurusan': 1,
-    'Kurikulum': 2,
-    'HEM': 3,
-    'Kokurikulum': 4,
-    'Kesenian': 5,
-    'Umum': 6
-  };
-
-  const selectedEvents = selectedDate 
-    ? events.filter(e => e.date === selectedDate).sort((a, b) => {
-        const orderA = a.category ? categoryOrder[a.category] || 99 : 99;
-        const orderB = b.category ? categoryOrder[b.category] || 99 : 99;
-        return orderA - orderB;
-      })
-    : [];
+  const selectedEvents = selectedDate ? events.filter(e => e.date === selectedDate) : [];
 
   return (
     <div className="space-y-6">
@@ -1283,11 +1127,7 @@ const Calendar = ({ events }: { events: TakwimEvent[] }) => {
               if (day === null) return <div key={`empty-${idx}`} className="h-12 md:h-20" />;
               
               const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-              const dayEvents = getEventsForDate(day).sort((a, b) => {
-                const orderA = a.category ? categoryOrder[a.category] || 99 : 99;
-                const orderB = b.category ? categoryOrder[b.category] || 99 : 99;
-                return orderA - orderB;
-              });
+              const dayEvents = getEventsForDate(day);
               const isSelected = selectedDate === dateStr;
               const isToday = new Date().toISOString().split('T')[0] === dateStr;
 
@@ -1310,7 +1150,7 @@ const Calendar = ({ events }: { events: TakwimEvent[] }) => {
                         key={i} 
                         className={`
                           w-1.5 h-1.5 md:w-2 md:h-2 rounded-full
-                          ${getEventColor(e).dot}
+                          ${e.type === 'Cuti' ? 'bg-red-500' : e.type === 'Program' ? 'bg-indigo-500' : e.type === 'Peperiksaan' ? 'bg-amber-500' : 'bg-slate-400'}
                         `}
                         title={e.title}
                       />
@@ -1342,11 +1182,16 @@ const Calendar = ({ events }: { events: TakwimEvent[] }) => {
                     initial={{ opacity: 0, x: 10 }}
                     animate={{ opacity: 1, x: 0 }}
                     key={i}
-                    className={`p-4 neu-inset rounded-2xl border-l-4 ${getEventColor(e).border}`}
+                    className="p-4 neu-inset rounded-2xl border-l-4 border-l-indigo-500"
                   >
                     <div className="flex items-center justify-between mb-1">
-                      <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border ${getEventColor(e).badge}`}>
-                        {e.category || e.type}
+                      <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${
+                        e.type === 'Cuti' ? 'bg-red-50 text-red-600' : 
+                        e.type === 'Program' ? 'bg-indigo-50 text-indigo-600' : 
+                        e.type === 'Peperiksaan' ? 'bg-amber-50 text-amber-600' : 
+                        'bg-slate-50 text-slate-600'
+                      }`}>
+                        {e.type}
                       </span>
                     </div>
                     <h5 className="font-bold text-slate-800 text-sm">{e.title}</h5>
@@ -1370,25 +1215,14 @@ const Calendar = ({ events }: { events: TakwimEvent[] }) => {
             {/* Legend */}
             <div className="mt-8 pt-6 border-t border-slate-100 space-y-2">
               <h5 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">Petunjuk</h5>
-              <div className="grid grid-cols-2 gap-2">
-                <div className="flex items-center gap-2 text-[10px] font-bold text-slate-600">
-                  <div className="w-2 h-2 rounded-full bg-purple-500" /> Pengurusan
-                </div>
-                <div className="flex items-center gap-2 text-[10px] font-bold text-slate-600">
-                  <div className="w-2 h-2 rounded-full bg-green-500" /> Kurikulum
-                </div>
-                <div className="flex items-center gap-2 text-[10px] font-bold text-slate-600">
-                  <div className="w-2 h-2 rounded-full bg-blue-500" /> HEM
-                </div>
-                <div className="flex items-center gap-2 text-[10px] font-bold text-slate-600">
-                  <div className="w-2 h-2 rounded-full bg-orange-500" /> Kokurikulum
-                </div>
-                <div className="flex items-center gap-2 text-[10px] font-bold text-slate-600">
-                  <div className="w-2 h-2 rounded-full bg-gray-800" /> Kesenian
-                </div>
-                <div className="flex items-center gap-2 text-[10px] font-bold text-slate-600">
-                  <div className="w-2 h-2 rounded-full bg-red-500" /> Cuti
-                </div>
+              <div className="flex items-center gap-3 text-[10px] font-bold text-slate-600">
+                <div className="w-2 h-2 rounded-full bg-red-500" /> Cuti Sekolah/Umum
+              </div>
+              <div className="flex items-center gap-3 text-[10px] font-bold text-slate-600">
+                <div className="w-2 h-2 rounded-full bg-indigo-500" /> Program Sekolah
+              </div>
+              <div className="flex items-center gap-3 text-[10px] font-bold text-slate-600">
+                <div className="w-2 h-2 rounded-full bg-amber-500" /> Peperiksaan
               </div>
             </div>
           </div>
@@ -1409,6 +1243,7 @@ const Dashboard = ({
   teachersError,
   onOpenWarga,
   takwimEvents,
+  refreshTakwim,
 }: {
   links: WebLink[];
   isLoadingLinks: boolean;
@@ -1420,6 +1255,7 @@ const Dashboard = ({
   teachersError: string;
   onOpenWarga: () => void;
   takwimEvents: TakwimEvent[];
+  refreshTakwim: () => void;
 }) => {
   const [showAttendanceModal, setShowAttendanceModal] = useState(false);
 
@@ -1452,7 +1288,7 @@ const Dashboard = ({
             onClick={onOpenWarga}
             className="px-6 py-2 bg-white text-violet-600 rounded-xl text-sm font-bold shadow-md hover:bg-purple-50 transition-colors"
           >
-            Jom kenali warga S1STEN
+            Jom kenali warga SSEMJ
           </motion.button>
         </div>
         
@@ -1463,6 +1299,75 @@ const Dashboard = ({
         {/* 3D-like Icon Placeholder */}
         <div className="absolute right-10 top-1/2 -translate-y-1/2 hidden md:flex items-center justify-center w-32 h-32 bg-white/20 backdrop-blur-md rounded-2xl border border-white/30 shadow-xl rotate-6 transform hover:rotate-0 transition-transform duration-500">
            <BookOpen size={48} className="text-white drop-shadow-md" />
+        </div>
+      </div>
+
+      {/* Takwim Sekolah 2026 Section */}
+      <div className="space-y-6">
+        <div className="flex justify-between items-center">
+          <h2 className="text-2xl font-bold text-slate-800 flex items-center gap-3">
+            <div className="p-2 neu-icon-wrapper rounded-xl text-indigo-500">
+              <CalendarCheck size={20} />
+            </div>
+            Takwim Sekolah 2026
+          </h2>
+          <div className="flex items-center gap-2">
+             <button 
+               onClick={refreshTakwim}
+               className="p-2 bg-white text-indigo-600 rounded-xl border border-indigo-100 shadow-sm hover:bg-indigo-50 transition-colors flex items-center justify-center"
+               title="Muat Semula Takwim"
+             >
+               <RefreshCw size={16} />
+             </button>
+             <span className="px-3 py-1 bg-indigo-50 text-indigo-600 text-[10px] font-bold rounded-full border border-indigo-100 uppercase tracking-wider hidden sm:inline-block">
+               {takwimEvents.length} Acara Dijadualkan
+             </span>
+          </div>
+        </div>
+        <Calendar events={takwimEvents} />
+      </div>
+
+      {/* Upcoming Events List */}
+      <div className="space-y-6">
+        <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
+          <Sparkles size={18} className="text-amber-500" />
+          Aktiviti Akan Datang
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {takwimEvents
+            .filter(e => new Date(e.date) >= new Date(new Date().setHours(0,0,0,0)))
+            .sort((a, b) => a.date.localeCompare(b.date))
+            .slice(0, 6)
+            .map((event) => (
+              <motion.div
+                key={event.id}
+                whileHover={{ y: -2 }}
+                className="p-5 neu-glass border-l-4 border-l-indigo-500 flex flex-col gap-2"
+              >
+                <div className="flex justify-between items-start">
+                  <span className="text-[10px] font-bold text-indigo-600 uppercase tracking-widest">
+                    {formatDate(event.date)}
+                  </span>
+                  <span className={`text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${
+                    event.type === 'Cuti' ? 'bg-red-50 text-red-600' : 
+                    event.type === 'Program' ? 'bg-indigo-50 text-indigo-600' : 
+                    event.type === 'Peperiksaan' ? 'bg-amber-50 text-amber-600' : 
+                    'bg-slate-50 text-slate-600'
+                  }`}>
+                    {event.type}
+                  </span>
+                </div>
+                <h4 className="font-bold text-slate-800 text-sm line-clamp-2">{event.title}</h4>
+                {event.description && (
+                  <p className="text-[10px] text-slate-500 mt-1 italic">{event.description}</p>
+                )}
+              </motion.div>
+            ))}
+          {takwimEvents.filter(e => new Date(e.date) >= new Date(new Date().setHours(0,0,0,0))).length === 0 && (
+            <div className="col-span-full p-8 text-center neu-inset rounded-2xl text-slate-400 text-sm italic">
+              Tiada aktiviti akan datang dijadualkan.
+            </div>
+          )}
         </div>
       </div>
 
@@ -1485,7 +1390,7 @@ const Dashboard = ({
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6 auto-rows-fr grid-flow-dense">
             {links.map((link) => {
-               const isProminent = link.title.toLowerCase().includes('smart rph') || link.title.toLowerCase().includes('e-opr') || link.title.toLowerCase().includes('hadir seni');
+               const isProminent = link.title.toLowerCase().includes('smart rph') || link.title.toLowerCase().includes('e-opr');
                return (
               <motion.div
                 key={link.id}
@@ -1496,6 +1401,18 @@ const Dashboard = ({
                   ${isProminent ? 'col-span-2 row-span-1 p-6 min-h-[160px] flex-row gap-6 text-left' : 'flex-col p-6 min-h-[160px] text-center'}
                 `}
               >
+                {/* Direct New Tab Shortcut Button */}
+                <a
+                  href={link.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  onClick={(e) => e.stopPropagation()}
+                  title="Buka di tab baharu (disyorkan untuk cetakan & muat turun fail PDF)"
+                  className="absolute top-3 right-3 p-1.5 rounded-xl bg-slate-50 hover:bg-violet-100 text-slate-400 hover:text-violet-600 transition-colors z-10 opacity-70 group-hover:opacity-100 shadow-xs"
+                >
+                  <ExternalLink size={16} />
+                </a>
+
                 <div className={`
                   rounded-2xl flex items-center justify-center text-violet-600 transition-transform duration-300 group-hover:scale-110 bg-violet-50 shrink-0 shadow-inner
                   ${isProminent ? 'w-20 h-20 mb-0' : 'w-16 h-16 mb-4'}
@@ -1518,9 +1435,16 @@ const Dashboard = ({
                     className={link.iconUrl ? "hidden" : ""}
                   />
                 </div>
-                <span className={`font-bold text-slate-800 line-clamp-2 group-hover:text-violet-600 transition-colors ${isProminent ? 'text-xl tracking-tight' : 'text-sm'}`}>
-                  {link.title}
-                </span>
+                <div className={isProminent ? "flex-1 min-w-0" : ""}>
+                  <span className={`font-bold text-slate-800 line-clamp-2 group-hover:text-violet-600 transition-colors ${isProminent ? 'text-xl tracking-tight' : 'text-sm'}`}>
+                    {link.title}
+                  </span>
+                  {isProminent && (
+                    <p className="text-xs text-slate-400 mt-1 line-clamp-1">
+                      Klik untuk buka aplikasi
+                    </p>
+                  )}
+                </div>
               </motion.div>
             )})}
 
@@ -1531,24 +1455,6 @@ const Dashboard = ({
             )}
           </div>
         )}
-      </div>
-
-      {/* Takwim Sekolah 2026 Section */}
-      <div className="space-y-6">
-        <div className="flex justify-between items-center">
-          <h2 className="text-2xl font-bold text-slate-800 flex items-center gap-3">
-            <div className="p-2 neu-icon-wrapper rounded-xl text-indigo-500">
-              <CalendarCheck size={20} />
-            </div>
-            Takwim Sekolah 2026
-          </h2>
-          <div className="flex gap-2">
-             <span className="px-3 py-1 bg-indigo-50 text-indigo-600 text-[10px] font-bold rounded-full border border-indigo-100 uppercase tracking-wider">
-               {takwimEvents.length} Acara Dijadualkan
-             </span>
-          </div>
-        </div>
-        <Calendar events={takwimEvents} />
       </div>
 
       {/* Error Displays */}
@@ -1742,7 +1648,7 @@ const PengurusanPanitia = ({
       type: "pdf",
       size: "1.2 MB",
       date: new Date().toISOString().split("T")[0],
-      uploader: "Guru S1STEN",
+      uploader: "Guru SSEMJ",
     };
     setFiles([newFile, ...files]);
   };
@@ -1891,7 +1797,6 @@ const AdminPanel = ({
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
-  const [toast, setToast] = useState<{ message: string; type: "success" | "error" | "info" } | null>(null);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -1901,10 +1806,6 @@ const AdminPanel = ({
     } else {
       setError("Kata laluan salah");
     }
-  };
-
-  const showToast = (message: string, type: "success" | "error" | "info" = "success") => {
-    setToast({ message, type });
   };
 
   if (!isAuthenticated) {
@@ -2015,120 +1916,10 @@ const AdminPanel = ({
                 Sistem akan memproses data dan memaparkannya di kalendar Utama.
               </p>
             </div>
-            <div className="shrink-0 flex gap-3">
-              <button
-                onClick={async () => {
-                  try {
-                    const response = await fetch(GOOGLE_SHEET_CSV_URL_TAKWIM_READ);
-                    const csvText = await response.text();
-                    
-                    Papa.parse(csvText, {
-                      header: false,
-                      skipEmptyLines: true,
-                      complete: (results) => {
-                        if (!results.data || results.data.length === 0) {
-                          showToast("Fail CSV kosong atau tidak dapat dibaca.", "error");
-                          return;
-                        }
-
-                        let rows = results.data as string[][];
-                        
-                        if (rows.length > 0 && rows[0].length === 1) {
-                          if (rows[0][0].includes('\t')) rows = rows.map(r => r[0].split('\t'));
-                          else if (rows[0][0].includes(';')) rows = rows.map(r => r[0].split(';'));
-                        }
-
-                        let headerIdx = -1;
-                        for (let i = 0; i < Math.min(rows.length, 50); i++) {
-                          const row = rows[i].map(c => String(c).toLowerCase().trim());
-                          if (row.some(c => c === 'tarikh' || c === 'date' || c.includes('tarikh') || c.includes('tkh'))) {
-                            headerIdx = i;
-                            break;
-                          }
-                        }
-
-                        if (headerIdx === -1) headerIdx = 0;
-
-                        const normalize = (s: string) => String(s).toLowerCase().replace(/[^a-z0-9]/g, '').trim();
-                        const headers = rows[headerIdx].map(h => normalize(h));
-                        const dataRows = rows.slice(headerIdx + 1);
-
-                        const parsedEvents: TakwimEvent[] = [];
-                        
-                        dataRows.forEach((row, rowIdx) => {
-                          const dateIdx = headers.findIndex(h => h.includes('tarikh') || h.includes('date'));
-                          if (dateIdx === -1 || !row[dateIdx]) return;
-                          
-                          const rawDate = String(row[dateIdx]).trim();
-                          if (!rawDate || rawDate === "" || rawDate === "-") return;
-
-                          const isoDate = parseDateToISO(rawDate);
-                          if (!isoDate) return;
-
-                          const deptColumns = [
-                            { keywords: ['pengurusan', 'pentadbiran', 'admin', 'haripengurusan'], label: 'Pengurusan', type: 'Lain-lain' },
-                            { keywords: ['kurikulum', 'akademik', 'akdmk'], label: 'Kurikulum', type: 'Program' },
-                            { keywords: ['hem', 'hal ehwal murid'], label: 'HEM', type: 'Program' },
-                            { keywords: ['kokurikulum', 'koko', 'sukan', 'ko-ku'], label: 'Kokurikulum', type: 'Program' },
-                            { keywords: ['kesenian', 'seni'], label: 'Kesenian', type: 'Program' }
-                          ];
-
-                          deptColumns.forEach(dept => {
-                            const colIdx = headers.findIndex(h => dept.keywords.some(kw => h === normalize(kw) || h.includes(normalize(kw))));
-                            if (colIdx !== -1 && row[colIdx]) {
-                              const rawContent = String(row[colIdx]).trim();
-                              if (!rawContent || rawContent === "" || rawContent === "-" || rawContent.toLowerCase() === "tiada" || rawContent.toLowerCase() === "n/a") return;
-
-                              // Split by newline to handle multiple events in one cell
-                              const contents = rawContent.split(/\n+/).map(c => c.trim()).filter(c => c.length > 0);
-
-                              contents.forEach((content, subIdx) => {
-                                let finalType = dept.type;
-                                const lowerContent = content.toLowerCase();
-                                if (lowerContent.includes("cuti") || lowerContent.includes("perayaan") || lowerContent.includes("holiday")) finalType = "Cuti";
-                                else if (lowerContent.includes("peperiksaan") || lowerContent.includes("ujian") || lowerContent.includes("assessment") || lowerContent.includes("pentaksiran") || lowerContent.includes("exam")) finalType = "Peperiksaan";
-                                else if (lowerContent.includes("mesyuarat") || lowerContent.includes("taklimat") || lowerContent.includes("ladap") || lowerContent.includes("bengkel")) finalType = "Lain-lain";
-
-                                const isDuplicate = parsedEvents.some(e => e.date === isoDate && e.title === content);
-                                if (!isDuplicate) {
-                                  parsedEvents.push({
-                                    id: `sheet-${rowIdx}-${dept.label}-${subIdx}-${Math.random().toString(36).substr(2, 5)}`,
-                                    title: content,
-                                    date: isoDate,
-                                    type: finalType as any,
-                                    description: `Kategori: ${dept.label}`,
-                                    category: dept.label as any
-                                  });
-                                }
-                              });
-                            }
-                          });
-                        });
-                        
-                        if (parsedEvents.length > 0) {
-                          saveTakwim(parsedEvents);
-                          showToast(`Berjaya menyegerak ${parsedEvents.length} acara dari Google Sheet.`);
-                        } else {
-                          showToast("Tiada data acara sah dijumpai dalam Google Sheet.", "error");
-                        }
-                      },
-                      error: (err) => {
-                        showToast(`Ralat memproses CSV: ${err.message}`, "error");
-                      }
-                    });
-                  } catch (e) {
-                    console.error("Error syncing takwim from sheet:", e);
-                    showToast("Gagal menyegerak dari Google Sheet.", "error");
-                  }
-                }}
-                className="flex items-center gap-2 px-6 py-3 neu-icon-wrapper text-teal-600 rounded-xl font-bold cursor-pointer hover:scale-105 transition-transform"
-              >
-                <RefreshCw size={20} />
-                <span>Sync Google Sheet</span>
-              </button>
+            <div className="shrink-0">
               <label className="flex items-center gap-2 px-6 py-3 neu-icon-wrapper text-indigo-600 rounded-xl font-bold cursor-pointer hover:scale-105 transition-transform">
                 <Upload size={20} />
-                <span>Muat Naik CSV</span>
+                <span>Pilih Fail CSV</span>
                 <input 
                   type="file" 
                   accept=".csv" 
@@ -2141,7 +1932,7 @@ const AdminPanel = ({
                         skipEmptyLines: true,
                         complete: (results) => {
                           if (!results.data || results.data.length === 0) {
-                            showToast("Fail CSV kosong atau tidak dapat dibaca.", "error");
+                            alert("Fail CSV kosong atau tidak dapat dibaca.");
                             return;
                           }
 
@@ -2179,12 +1970,7 @@ const AdminPanel = ({
                           const parsedEvents: TakwimEvent[] = [];
                           
                           dataRows.forEach((row, rowIdx) => {
-                            // Find date column, handling potential merged headers like 'haripengurusan'
-                            let dateIdx = headers.findIndex(h => h === 'tarikh' || h === 'date');
-                            if (dateIdx === -1) {
-                                // Fallback if exact match not found
-                                dateIdx = headers.findIndex(h => h.includes('tarikh') || h.includes('date'));
-                            }
+                            const dateIdx = headers.findIndex(h => h.includes('tarikh') || h.includes('date'));
                             if (dateIdx === -1 || !row[dateIdx]) return;
                             
                             const rawDate = String(row[dateIdx]).trim();
@@ -2193,58 +1979,51 @@ const AdminPanel = ({
                             const isoDate = parseDateToISO(rawDate);
                             if (!isoDate) return;
 
-                            // Specific columns to check for events based on user's CSV structure
-                            // MINGGU, TARIKH, HARI, PENGURUSAN, KURIKULUM, HEM, KOKURIKULUM, KESENIAN
-                            // Sometimes HARI and PENGURUSAN might be merged as HARIPENGURUSAN
+                            // Specific columns to check for events
                             const deptColumns = [
-                              { keywords: ['pengurusan', 'pentadbiran', 'admin', 'haripengurusan'], label: 'Pengurusan', type: 'Lain-lain' },
+                              { keywords: ['pengurusan', 'pentadbiran', 'admin'], label: 'Pengurusan', type: 'Lain-lain' },
                               { keywords: ['kurikulum', 'akademik', 'akdmk'], label: 'Kurikulum', type: 'Program' },
                               { keywords: ['hem', 'hal ehwal murid'], label: 'HEM', type: 'Program' },
                               { keywords: ['kokurikulum', 'koko', 'sukan', 'ko-ku'], label: 'Kokurikulum', type: 'Program' },
-                              { keywords: ['kesenian', 'seni'], label: 'Kesenian', type: 'Program' }
+                              { keywords: ['kesenian', 'seni'], label: 'Kesenian', type: 'Program' },
+                              { keywords: ['aktiviti', 'perkara', 'acara', 'tajuk', 'program', 'keterangan', 'peristiwa', 'catatan'], label: 'Umum', type: 'Program' }
                             ];
 
                             deptColumns.forEach(dept => {
-                              const colIdx = headers.findIndex(h => dept.keywords.some(kw => h === normalize(kw) || h.includes(normalize(kw))));
+                              const colIdx = headers.findIndex(h => dept.keywords.some(kw => h.includes(normalize(kw))));
                               if (colIdx !== -1 && row[colIdx]) {
-                                const rawContent = String(row[colIdx]).trim();
+                                const content = String(row[colIdx]).trim();
                                 
                                 // Skip if empty or just a dash or "tiada"
-                                if (!rawContent || rawContent === "" || rawContent === "-" || rawContent.toLowerCase() === "tiada" || rawContent.toLowerCase() === "n/a") return;
+                                if (!content || content === "" || content === "-" || content.toLowerCase() === "tiada" || content.toLowerCase() === "n/a") return;
 
-                                // Split by newline to handle multiple events in one cell
-                                const contents = rawContent.split(/\n+/).map(c => c.trim()).filter(c => c.length > 0);
+                                // Determine type based on content keywords
+                                let finalType = dept.type;
+                                const lowerContent = content.toLowerCase();
+                                if (lowerContent.includes("cuti") || lowerContent.includes("perayaan") || lowerContent.includes("holiday")) finalType = "Cuti";
+                                else if (lowerContent.includes("peperiksaan") || lowerContent.includes("ujian") || lowerContent.includes("assessment") || lowerContent.includes("pentaksiran") || lowerContent.includes("exam")) finalType = "Peperiksaan";
+                                else if (lowerContent.includes("mesyuarat") || lowerContent.includes("taklimat") || lowerContent.includes("ladap") || lowerContent.includes("bengkel")) finalType = "Lain-lain";
 
-                                contents.forEach((content, subIdx) => {
-                                  // Determine type based on content keywords
-                                  let finalType = dept.type;
-                                  const lowerContent = content.toLowerCase();
-                                  if (lowerContent.includes("cuti") || lowerContent.includes("perayaan") || lowerContent.includes("holiday")) finalType = "Cuti";
-                                  else if (lowerContent.includes("peperiksaan") || lowerContent.includes("ujian") || lowerContent.includes("assessment") || lowerContent.includes("pentaksiran") || lowerContent.includes("exam")) finalType = "Peperiksaan";
-                                  else if (lowerContent.includes("mesyuarat") || lowerContent.includes("taklimat") || lowerContent.includes("ladap") || lowerContent.includes("bengkel")) finalType = "Lain-lain";
-
-                                  // Avoid duplicates if multiple columns match the same content for the same date
-                                  const isDuplicate = parsedEvents.some(e => e.date === isoDate && e.title === content);
-                                  if (!isDuplicate) {
-                                    parsedEvents.push({
-                                      id: `csv-${Date.now()}-${rowIdx}-${dept.label}-${subIdx}-${Math.random().toString(36).substr(2, 5)}`,
-                                      title: content,
-                                      date: isoDate,
-                                      type: finalType as any,
-                                      description: `Kategori: ${dept.label}`,
-                                      category: dept.label as any
-                                    });
-                                  }
-                                });
+                                // Avoid duplicates if multiple columns match the same content for the same date
+                                const isDuplicate = parsedEvents.some(e => e.date === isoDate && e.title === content);
+                                if (!isDuplicate) {
+                                  parsedEvents.push({
+                                    id: `csv-${Date.now()}-${rowIdx}-${dept.label}-${Math.random().toString(36).substr(2, 5)}`,
+                                    title: content,
+                                    date: isoDate,
+                                    type: finalType as any,
+                                    description: `Jabatan: ${dept.label}`
+                                  });
+                                }
                               }
                             });
                           });
                           
                           if (parsedEvents.length > 0) {
                             saveTakwim([...takwimEvents, ...parsedEvents]);
-                            showToast(`Berjaya memuat naik ${parsedEvents.length} acara.`);
+                            alert(`Berjaya memuat naik ${parsedEvents.length} acara.`);
                           } else {
-                            showToast("Tiada data acara sah dijumpai. Sila pastikan fail CSV mempunyai kolum 'Tarikh' dan kolum aktiviti.", "error");
+                            alert("Tiada data acara sah dijumpai. Sila pastikan fail CSV mempunyai kolum 'Tarikh' dan kolum aktiviti (seperti Pengurusan, Kurikulum, HEM, Kokurikulum atau Aktiviti).");
                           }
                           
                           // Reset file input so the same file can be uploaded again
@@ -2253,7 +2032,7 @@ const AdminPanel = ({
                           }
                         },
                         error: (err) => {
-                          showToast(`Ralat memproses CSV: ${err.message}`, "error");
+                          alert(`Ralat memproses CSV: ${err.message}`);
                         }
                       });
                     }
@@ -2268,80 +2047,44 @@ const AdminPanel = ({
               <thead className="sticky top-0 bg-white z-10">
                 <tr className="border-b border-white/40">
                   <th className="p-4 font-bold text-gray-500 uppercase tracking-wider text-[10px]">Tarikh</th>
-                  <th className="p-4 font-bold text-gray-500 uppercase tracking-wider text-[10px]">Pengurusan</th>
-                  <th className="p-4 font-bold text-gray-500 uppercase tracking-wider text-[10px]">Kurikulum</th>
-                  <th className="p-4 font-bold text-gray-500 uppercase tracking-wider text-[10px]">HEM</th>
-                  <th className="p-4 font-bold text-gray-500 uppercase tracking-wider text-[10px]">Kokurikulum</th>
-                  <th className="p-4 font-bold text-gray-500 uppercase tracking-wider text-[10px]">Kesenian</th>
+                  <th className="p-4 font-bold text-gray-500 uppercase tracking-wider text-[10px]">Tajuk</th>
+                  <th className="p-4 font-bold text-gray-500 uppercase tracking-wider text-[10px]">Jenis</th>
                   <th className="p-4 font-bold text-gray-500 uppercase tracking-wider text-[10px] text-right">Tindakan</th>
                 </tr>
               </thead>
               <tbody>
-                {(() => {
-                  const groupedEvents = takwimEvents.reduce((acc, event) => {
-                    if (!acc[event.date]) {
-                      acc[event.date] = {
-                        date: event.date,
-                        Pengurusan: [],
-                        Kurikulum: [],
-                        HEM: [],
-                        Kokurikulum: [],
-                        Kesenian: []
-                      };
-                    }
-                    if (event.category === 'Pengurusan') acc[event.date].Pengurusan.push(event);
-                    else if (event.category === 'Kurikulum') acc[event.date].Kurikulum.push(event);
-                    else if (event.category === 'HEM') acc[event.date].HEM.push(event);
-                    else if (event.category === 'Kokurikulum') acc[event.date].Kokurikulum.push(event);
-                    else if (event.category === 'Kesenian') acc[event.date].Kesenian.push(event);
-                    return acc;
-                  }, {} as Record<string, any>);
-
-                  const sortedDates = Object.keys(groupedEvents).sort((a, b) => a.localeCompare(b));
-
-                  if (sortedDates.length === 0) {
-                    return (
-                      <tr>
-                        <td colSpan={7} className="p-8 text-center text-gray-400 text-sm italic">
-                          Tiada data takwim. Sila muat naik fail CSV.
-                        </td>
-                      </tr>
-                    );
-                  }
-
-                  return sortedDates.map((date) => {
-                    const dayData = groupedEvents[date];
-                    return (
-                      <tr key={date} className="border-b border-white/20 hover:bg-white/30 transition-colors">
-                        <td className="p-4 text-xs font-medium text-gray-600 whitespace-nowrap align-top">{formatDate(date)}</td>
-                        <td className="p-4 text-xs align-top">
-                          {dayData.Pengurusan.map((e: any) => <div key={e.id} className="mb-1 font-bold text-purple-600">{e.title}</div>)}
-                        </td>
-                        <td className="p-4 text-xs align-top">
-                          {dayData.Kurikulum.map((e: any) => <div key={e.id} className="mb-1 font-bold text-green-600">{e.title}</div>)}
-                        </td>
-                        <td className="p-4 text-xs align-top">
-                          {dayData.HEM.map((e: any) => <div key={e.id} className="mb-1 font-bold text-blue-600">{e.title}</div>)}
-                        </td>
-                        <td className="p-4 text-xs align-top">
-                          {dayData.Kokurikulum.map((e: any) => <div key={e.id} className="mb-1 font-bold text-orange-600">{e.title}</div>)}
-                        </td>
-                        <td className="p-4 text-xs align-top">
-                          {dayData.Kesenian.map((e: any) => <div key={e.id} className="mb-1 font-bold text-gray-800">{e.title}</div>)}
-                        </td>
-                        <td className="p-4 text-right align-top">
-                          <button 
-                            onClick={() => saveTakwim(takwimEvents.filter(e => e.date !== date))}
-                            className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
-                            title="Padam semua acara pada tarikh ini"
-                          >
-                            <Trash2 size={14} />
-                          </button>
-                        </td>
-                      </tr>
-                    );
-                  });
-                })()}
+                {takwimEvents.length > 0 ? (
+                  [...takwimEvents].sort((a,b) => a.date.localeCompare(b.date)).map((event) => (
+                    <tr key={event.id} className="border-b border-white/20 hover:bg-white/30 transition-colors">
+                      <td className="p-4 text-xs font-medium text-gray-600">{formatDate(event.date)}</td>
+                      <td className="p-4 text-xs font-bold text-gray-800">{event.title}</td>
+                      <td className="p-4">
+                        <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${
+                          event.type === 'Cuti' ? 'bg-red-50 text-red-600' : 
+                          event.type === 'Program' ? 'bg-indigo-50 text-indigo-600' : 
+                          event.type === 'Peperiksaan' ? 'bg-amber-50 text-amber-600' : 
+                          'bg-slate-50 text-slate-600'
+                        }`}>
+                          {event.type}
+                        </span>
+                      </td>
+                      <td className="p-4 text-right">
+                        <button 
+                          onClick={() => saveTakwim(takwimEvents.filter(e => e.id !== event.id))}
+                          className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={4} className="p-8 text-center text-gray-400 text-sm italic">
+                      Tiada data takwim. Sila muat naik fail CSV.
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
@@ -2351,7 +2094,7 @@ const AdminPanel = ({
         <div className="neu-glass p-8 space-y-6">
           <div className="flex justify-between items-center">
             <h3 className="text-lg font-bold text-gray-800">
-              Urus APLIKASI DIGITAL UNTUK WARGA S1STEN
+              Urus APLIKASI DIGITAL UNTUK WARGA SSEMJ
             </h3>
             <button
               onClick={refreshLinks}
@@ -2597,17 +2340,6 @@ const AdminPanel = ({
           </div>
         </div>
       </div>
-
-      {/* Toast Notification */}
-      <AnimatePresence>
-        {toast && (
-          <Toast 
-            message={toast.message} 
-            type={toast.type} 
-            onClose={() => setToast(null)} 
-          />
-        )}
-      </AnimatePresence>
     </div>
   );
 };
@@ -2662,9 +2394,12 @@ const KeberadaanForm = ({ teachers, attendance }: { teachers: Teacher[], attenda
       lewat: lewat,
     };
 
-    if (GOOGLE_SCRIPT_URL_KEBERADAAN) {
+    const GAS_URL =
+      "https://script.google.com/macros/s/AKfycbwRCh28Sanh3iQ8QStluKGDC_FnIjhc_4cfB7xfFdoz-z0zJ7oZkQV-grYN5qJY_Hu47A/exec";
+
+    if (GAS_URL) {
       try {
-        await fetch(GOOGLE_SCRIPT_URL_KEBERADAAN, {
+        await fetch(GAS_URL, {
           method: "POST",
           mode: "no-cors", // Required to avoid CORS issues with simple GAS deployments
           headers: {
@@ -3012,11 +2747,6 @@ const SenaraiMurid = ({ students, isLoading, error, onTransfer }: { students: St
   const [filterBidang, setFilterBidang] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [copiedId, setCopiedId] = useState<string | null>(null);
-  const [confirmTransfer, setConfirmTransfer] = useState<{ isOpen: boolean; studentName: string; studentId: string }>({
-    isOpen: false,
-    studentName: "",
-    studentId: ""
-  });
 
   const uniqueTingkatan = Array.from(new Set(students.map(s => s.tingkatan).filter(Boolean))).sort();
   const uniqueBidang = Array.from(new Set(students.map(s => s.bidang).filter(Boolean))).sort();
@@ -3057,17 +2787,6 @@ const SenaraiMurid = ({ students, isLoading, error, onTransfer }: { students: St
 
   return (
     <div className="space-y-8">
-      <ConfirmModal 
-        isOpen={confirmTransfer.isOpen}
-        title="Pindah Murid"
-        message={`Adakah anda pasti ingin memindahkan murid ${confirmTransfer.studentName}? Tindakan ini akan mengeluarkan murid dari senarai semasa.`}
-        confirmText="Ya, Pindah"
-        onConfirm={() => {
-          onTransfer(confirmTransfer.studentId);
-          setConfirmTransfer({ ...confirmTransfer, isOpen: false });
-        }}
-        onCancel={() => setConfirmTransfer({ ...confirmTransfer, isOpen: false })}
-      />
       <div className="flex items-center gap-3 mb-6">
         <div className="p-2 neu-icon-wrapper rounded-xl text-blue-500">
           <Users size={24} />
@@ -3212,11 +2931,9 @@ const SenaraiMurid = ({ students, isLoading, error, onTransfer }: { students: St
                         </button>
                         <button
                           onClick={() => {
-                            setConfirmTransfer({
-                              isOpen: true,
-                              studentName: student.nama,
-                              studentId: student.kadPengenalan
-                            });
+                            if (window.confirm(`Adakah anda pasti ingin memindahkan murid ${student.nama}?`)) {
+                              onTransfer(student.kadPengenalan);
+                            }
                           }}
                           className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors inline-flex items-center justify-center"
                           title="Pindah Murid"
@@ -3248,120 +2965,109 @@ export default function App() {
 
   const fetchTakwim = async () => {
     try {
-      let localEvents: TakwimEvent[] = [];
       const res = await fetch("/api/takwim");
       if (res.ok) {
         const data = await res.json();
         if (data && data.length > 0) {
-          localEvents = data;
+          setTakwimEvents(data);
+        } else {
+          // If local DB is empty, try fetching from Google Sheet
+          fetchTakwimFromSheet();
         }
-      }
-      
-      // Fetch from Google Sheet and merge
-      try {
-        const response = await fetch(GOOGLE_SHEET_CSV_URL_TAKWIM_READ);
-        const csvText = await response.text();
-        
-        Papa.parse(csvText, {
-          header: false,
-          skipEmptyLines: true,
-          complete: (results) => {
-            if (!results.data || results.data.length === 0) {
-              setTakwimEvents(localEvents);
-              return;
-            }
-
-            let rows = results.data as string[][];
-            if (rows.length > 0 && rows[0].length === 1) {
-              if (rows[0][0].includes('\t')) rows = rows.map(r => r[0].split('\t'));
-              else if (rows[0][0].includes(';')) rows = rows.map(r => r[0].split(';'));
-            }
-
-            let headerIdx = -1;
-            for (let i = 0; i < Math.min(rows.length, 50); i++) {
-              const row = rows[i].map(c => String(c).toLowerCase().trim());
-              if (row.some(c => c === 'tarikh' || c === 'date' || c.includes('tarikh') || c.includes('tkh'))) {
-                headerIdx = i;
-                break;
-              }
-            }
-
-            if (headerIdx === -1) headerIdx = 0;
-
-            const normalize = (s: string) => String(s).toLowerCase().replace(/[^a-z0-9]/g, '').trim();
-            const headers = rows[headerIdx].map(h => normalize(h));
-            const dataRows = rows.slice(headerIdx + 1);
-
-            const parsedEvents: TakwimEvent[] = [];
-            
-            dataRows.forEach((row, rowIdx) => {
-              const dateIdx = headers.findIndex(h => h.includes('tarikh') || h.includes('date'));
-              if (dateIdx === -1 || !row[dateIdx]) return;
-              
-              const rawDate = String(row[dateIdx]).trim();
-              if (!rawDate || rawDate === "" || rawDate === "-") return;
-
-              const isoDate = parseDateToISO(rawDate);
-              if (!isoDate) return;
-
-              const deptColumns = [
-                { keywords: ['pengurusan', 'pentadbiran', 'admin', 'haripengurusan'], label: 'Pengurusan', type: 'Lain-lain' },
-                { keywords: ['kurikulum', 'akademik', 'akdmk'], label: 'Kurikulum', type: 'Program' },
-                { keywords: ['hem', 'hal ehwal murid'], label: 'HEM', type: 'Program' },
-                { keywords: ['kokurikulum', 'koko', 'sukan', 'ko-ku'], label: 'Kokurikulum', type: 'Program' },
-                { keywords: ['kesenian', 'seni'], label: 'Kesenian', type: 'Program' }
-              ];
-
-              deptColumns.forEach(dept => {
-                const colIdx = headers.findIndex(h => dept.keywords.some(kw => h === normalize(kw) || h.includes(normalize(kw))));
-                if (colIdx !== -1 && row[colIdx]) {
-                  const rawContent = String(row[colIdx]).trim();
-                  if (!rawContent || rawContent === "" || rawContent === "-" || rawContent.toLowerCase() === "tiada" || rawContent.toLowerCase() === "n/a") return;
-
-                  // Split by newline to handle multiple events in one cell
-                  const contents = rawContent.split(/\n+/).map(c => c.trim()).filter(c => c.length > 0);
-
-                  contents.forEach((content, subIdx) => {
-                    let finalType = dept.type;
-                    const lowerContent = content.toLowerCase();
-                    if (lowerContent.includes("cuti") || lowerContent.includes("perayaan") || lowerContent.includes("holiday")) finalType = "Cuti";
-                    else if (lowerContent.includes("peperiksaan") || lowerContent.includes("ujian") || lowerContent.includes("assessment") || lowerContent.includes("pentaksiran") || lowerContent.includes("exam")) finalType = "Peperiksaan";
-                    else if (lowerContent.includes("mesyuarat") || lowerContent.includes("taklimat") || lowerContent.includes("ladap") || lowerContent.includes("bengkel")) finalType = "Lain-lain";
-
-                    const isDuplicate = parsedEvents.some(e => e.date === isoDate && e.title === content);
-                    if (!isDuplicate) {
-                      parsedEvents.push({
-                        id: `sheet-${rowIdx}-${dept.label}-${subIdx}-${Math.random().toString(36).substr(2, 5)}`,
-                        title: content,
-                        date: isoDate,
-                        type: finalType as any,
-                        description: `Kategori: ${dept.label}`,
-                        category: dept.label as any
-                      });
-                    }
-                  });
-                }
-              });
-            });
-            
-            // Merge local events and sheet events, avoiding exact duplicates
-            const mergedEvents = [...localEvents];
-            parsedEvents.forEach(sheetEvent => {
-              const exists = mergedEvents.some(e => e.date === sheetEvent.date && e.title === sheetEvent.title);
-              if (!exists) {
-                mergedEvents.push(sheetEvent);
-              }
-            });
-            
-            setTakwimEvents(mergedEvents);
-          }
-        });
-      } catch (sheetErr) {
-        console.error("Error fetching from sheet:", sheetErr);
-        setTakwimEvents(localEvents);
       }
     } catch (e) {
       console.error("Failed to fetch takwim:", e);
+      fetchTakwimFromSheet();
+    }
+  };
+
+  const fetchTakwimFromSheet = async () => {
+    try {
+      const response = await fetch(GOOGLE_SHEET_CSV_URL_TAKWIM_READ);
+      const csvText = await response.text();
+      
+      Papa.parse(csvText, {
+        header: false,
+        skipEmptyLines: true,
+        complete: (results) => {
+          if (!results.data || results.data.length === 0) return;
+
+          let rows = results.data as string[][];
+          
+          if (rows.length > 0 && rows[0].length === 1) {
+            if (rows[0][0].includes('\t')) rows = rows.map(r => r[0].split('\t'));
+            else if (rows[0][0].includes(';')) rows = rows.map(r => r[0].split(';'));
+          }
+
+          let headerIdx = -1;
+          for (let i = 0; i < Math.min(rows.length, 50); i++) {
+            const row = rows[i].map(c => String(c).toLowerCase().trim());
+            if (row.some(c => c === 'tarikh' || c === 'date' || c.includes('tarikh') || c.includes('tkh'))) {
+              headerIdx = i;
+              break;
+            }
+          }
+
+          if (headerIdx === -1) headerIdx = 0;
+
+          const normalize = (s: string) => String(s).toLowerCase().replace(/[^a-z0-9]/g, '').trim();
+          const headers = rows[headerIdx].map(h => normalize(h));
+          const dataRows = rows.slice(headerIdx + 1);
+
+          const parsedEvents: TakwimEvent[] = [];
+          
+          dataRows.forEach((row, rowIdx) => {
+            const dateIdx = headers.findIndex(h => h.includes('tarikh') || h.includes('date'));
+            if (dateIdx === -1 || !row[dateIdx]) return;
+            
+            const rawDate = String(row[dateIdx]).trim();
+            if (!rawDate || rawDate === "" || rawDate === "-") return;
+
+            const isoDate = parseDateToISO(rawDate);
+            if (!isoDate) return;
+
+            const deptColumns = [
+              { keywords: ['pengurusan', 'pentadbiran', 'admin'], label: 'Pengurusan', type: 'Lain-lain' },
+              { keywords: ['kurikulum', 'akademik', 'akdmk'], label: 'Kurikulum', type: 'Program' },
+              { keywords: ['hem', 'hal ehwal murid'], label: 'HEM', type: 'Program' },
+              { keywords: ['kokurikulum', 'koko', 'sukan', 'ko-ku'], label: 'Kokurikulum', type: 'Program' },
+              { keywords: ['kesenian', 'seni'], label: 'Kesenian', type: 'Program' },
+              { keywords: ['aktiviti', 'perkara', 'acara', 'tajuk', 'program', 'keterangan', 'peristiwa', 'catatan'], label: 'Umum', type: 'Program' }
+            ];
+
+            deptColumns.forEach(dept => {
+              const colIdx = headers.findIndex(h => dept.keywords.some(kw => h.includes(normalize(kw))));
+              if (colIdx !== -1 && row[colIdx]) {
+                const content = String(row[colIdx]).trim();
+                if (!content || content === "" || content === "-" || content.toLowerCase() === "tiada" || content.toLowerCase() === "n/a") return;
+
+                let finalType = dept.type;
+                const lowerContent = content.toLowerCase();
+                if (lowerContent.includes("cuti") || lowerContent.includes("perayaan") || lowerContent.includes("holiday")) finalType = "Cuti";
+                else if (lowerContent.includes("peperiksaan") || lowerContent.includes("ujian") || lowerContent.includes("assessment") || lowerContent.includes("pentaksiran") || lowerContent.includes("exam")) finalType = "Peperiksaan";
+                else if (lowerContent.includes("mesyuarat") || lowerContent.includes("taklimat") || lowerContent.includes("ladap") || lowerContent.includes("bengkel")) finalType = "Lain-lain";
+
+                const isDuplicate = parsedEvents.some(e => e.date === isoDate && e.title === content);
+                if (!isDuplicate) {
+                  parsedEvents.push({
+                    id: `sheet-${rowIdx}-${dept.label}-${Math.random().toString(36).substr(2, 5)}`,
+                    title: content,
+                    date: isoDate,
+                    type: finalType as any,
+                    description: `Jabatan: ${dept.label}`
+                  });
+                }
+              }
+            });
+          });
+          
+          if (parsedEvents.length > 0) {
+            setTakwimEvents(parsedEvents);
+          }
+        }
+      });
+    } catch (e) {
+      console.error("Error fetching takwim from sheet:", e);
     }
   };
 
@@ -3418,7 +3124,7 @@ export default function App() {
   }, [isDarkMode]);
 
   const toggleTheme = () => setIsDarkMode(!isDarkMode);
-  const [showWargaS1STEN, setShowWargaS1STEN] = useState(false);
+  const [showWargaSSEMJ, setShowWargaSSEMJ] = useState(false);
   const [activeApp, setActiveApp] = useState<WebLink | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -3919,9 +3625,12 @@ export default function App() {
       });
 
       // 2. Send to Google Sheet (Share_Link tab)
-      if (GOOGLE_SCRIPT_URL_LINKS && GOOGLE_SCRIPT_URL_LINKS !== "YOUR_DEPLOYED_SCRIPT_URL_HERE") {
+      // Replace this URL with your deployed Google Apps Script Web App URL
+      const GOOGLE_SCRIPT_URL = "YOUR_DEPLOYED_SCRIPT_URL_HERE"; 
+      
+      if (GOOGLE_SCRIPT_URL && GOOGLE_SCRIPT_URL !== "YOUR_DEPLOYED_SCRIPT_URL_HERE") {
         try {
-          await fetch(GOOGLE_SCRIPT_URL_LINKS, {
+          await fetch(GOOGLE_SCRIPT_URL, {
             method: "POST",
             mode: "no-cors", // Important for GAS without CORS headers
             headers: { "Content-Type": "application/json" },
@@ -3932,7 +3641,7 @@ export default function App() {
           console.error("Error sending to Google Sheet:", sheetError);
         }
       } else {
-        console.warn("Google Script URL for Links not set. Please update GOOGLE_SCRIPT_URL_LINKS in src/App.tsx.");
+        console.warn("Google Script URL not set. Please update GOOGLE_SCRIPT_URL in src/App.tsx.");
       }
 
       if (res.ok) {
@@ -3973,7 +3682,7 @@ export default function App() {
     { id: "murid", label: "Murid", icon: Users },
     { id: "pautan", label: "Senarai Pautan", icon: Link },
     { id: "keberadaan", label: "Borang Keberadaan", icon: ClipboardList },
-    { id: "panitia", label: "Pengurusan Panitia", icon: FolderOpen },
+    // { id: "panitia", label: "Pengurusan Panitia", icon: FolderOpen },
     { id: "admin", label: "Admin", icon: Settings },
   ];
 
@@ -4064,7 +3773,7 @@ export default function App() {
                   S1STEN
                 </h1>
                 <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">
-                  S1STEN 1 STOP CENTRE
+                  SSEMJ 1 STOP CENTRE
                 </p>
              </div>
            </div>
@@ -4186,10 +3895,13 @@ export default function App() {
                    announcements={announcements}
                    stats={stats}
                    attendance={attendance}
-                   onOpenApp={setActiveApp}
+                   onOpenApp={(link) => {
+                     window.open(link.url, "_blank", "noopener,noreferrer");
+                   }}
                    teachersError={teachersError}
-                   onOpenWarga={() => setShowWargaS1STEN(true)}
+                   onOpenWarga={() => setShowWargaSSEMJ(true)}
                    takwimEvents={takwimEvents}
+                   refreshTakwim={fetchTakwimFromSheet}
                  />
                )}
                {activeTab === "murid" && (
@@ -4235,12 +3947,12 @@ export default function App() {
         </main>
       </div>
 
-      {/* Warga S1STEN Modal */}
+      {/* Warga SSEMJ Modal */}
       <AnimatePresence>
-        {showWargaS1STEN && (
-          <WargaS1STENModal
+        {showWargaSSEMJ && (
+          <WargaSSEMJModal
             teachers={teachersList}
-            onClose={() => setShowWargaS1STEN(false)}
+            onClose={() => setShowWargaSSEMJ(false)}
           />
         )}
       </AnimatePresence>
