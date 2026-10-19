@@ -1,0 +1,22 @@
+S1STEN-MASTER: versi terkini (GitHub 6 Okt 2026) + semua pembaikan
+==================================================================
+
+APA YANG BERUBAH
+- public/sw.js          : "pembersih" - buang cache lama yang sebabkan SKRIN PUTIH di peranti kawan2
+- netlify.toml (BARU)   : pastikan index.html & sw.js tak disimpan lama dalam cache
+- index.html            : tajuk "S1STEN - Hub Pengurusan SSEMJ", favicon, ikon iPhone, manifest
+- public/manifest.json  : guna logo S1STEN untuk pemasangan (komputer/tablet/telefon)
+- public/icons/ (BARU)  : ikon semua saiz
+- public/favicon.ico (BARU), public/logo.png (BARU)
+- src/App.tsx           : logo header & sidebar kini guna /logo.png (bukan Google Drive)
+- Butang Cetak/PDF eRPH : sudah dibaiki dalam GitHub (sandbox dibuang) - dikekalkan
+
+CARA UPLOAD KE GITHUB (github.com/dzurrihensem/ONESTOPCENTRE)
+1. Buka repo > Add file > Upload files
+2. Seret SEMUA isi folder S1STEN-MASTER (bukan folder itu sendiri) ke dalam kotak upload.
+   Pastikan folder "public" (termasuk "public/icons") dan "src" ikut sekali.
+3. Commit changes. Netlify akan build & deploy automatik.
+
+SELEPAS DEPLOY
+- Peranti yang dapat skrin putih: buka sistendz.netlify.app, tutup & buka semula 1-2 kali.
+- Untuk ikon baharu: buang app S1STEN lama di peranti, kemudian install semula.

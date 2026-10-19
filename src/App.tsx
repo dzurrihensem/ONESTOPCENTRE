@@ -3704,12 +3704,10 @@ export default function App() {
       {/* Mobile Topbar */}
       <nav className="lg:hidden neu-glass-panel px-4 py-3 flex items-center justify-between sticky top-0 z-50">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-blue-50 p-1 flex items-center justify-center">
+          <div className="w-11 h-11 rounded-lg bg-white p-0.5 flex items-center justify-center">
              <img
-               src={getDirectImageUrl(
-                 "https://drive.google.com/file/d/1tyJ5QLBbqarYBYAzkFmPJ7ZBZ0fYp97u/view?usp=drive_link",
-               )}
-               alt="Logo"
+               src={"/logo.png"}
+               alt="Logo S1STEN"
                className="w-full h-full object-contain"
              />
           </div>
@@ -3761,10 +3759,8 @@ export default function App() {
            <div className="flex flex-col items-center gap-3">
              <div className="w-32 h-32 rounded-3xl bg-blue-50 p-4 flex items-center justify-center mb-4 neu-pressed">
                <img
-                 src={getDirectImageUrl(
-                   "https://drive.google.com/file/d/1tyJ5QLBbqarYBYAzkFmPJ7ZBZ0fYp97u/view?usp=drive_link",
-                 )}
-                 alt="Logo"
+                 src={"/logo.png"}
+                 alt="Logo S1STEN"
                  className="w-full h-full object-contain"
                />
              </div>
